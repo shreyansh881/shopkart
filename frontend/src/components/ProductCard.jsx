@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import api from '../services/api';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+  const { addToCart, cartItems } = useCart();
   const [saving, setSaving] = useState(false);
+  const [savingToCart, setSavingToCart] = useState(false);
   const [saved, setSaved] = useState(false);
   const [message, setMessage] = useState('');
+  const isInCart = cartItems.some((item) => item.product._id === product._id);
 
   const handleWishlist = async () => {
     if (saving) return;
@@ -30,6 +34,20 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  const handleAddToCart = async () => {
+    if (savingToCart || product.stock < 1) return;
+    setSavingToCart(true);
+    setMessage('');
+    try {
+      await addToCart(product._id);
+      setMessage('✓ Added to Cart');
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Unable to add product to cart');
+    } finally {
+      setSavingToCart(false);
+    }
+  };
+
   return (
     <div className="product-card">
       <img src={product.image} alt={product.name} className="product-image" />
@@ -49,12 +67,21 @@ const ProductCard = ({ product }) => {
             View Details
           </button>
 
+          <button
+            type="button"
+            className={`cart-btn ${isInCart ? 'in-cart' : ''}`}
+            onClick={handleAddToCart}
+            disabled={savingToCart || product.stock < 1}
+          >
+            {savingToCart ? 'Adding...' : isInCart ? 'Add Another' : product.stock < 1 ? 'Out of Stock' : 'Add to Cart'}
+          </button>
+
           <button type="button" className={`wishlist-btn ${saved ? 'saved' : ''}`} onClick={handleWishlist} disabled={saving}>
             {saving ? '⏳ Saving...' : saved ? '♥ Added to Wishlist' : '♡ Add to Wishlist'}
           </button>
         </div>
 
-        {message && <div className={`wishlist-message ${saved ? 'success' : 'error'}`}>{message}</div>}
+        {message && <div className={`action-message ${saved || message.startsWith('✓') ? 'success' : 'error'}`}>{message}</div>}
       </div>
     </div>
   );

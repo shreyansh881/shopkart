@@ -1,9 +1,11 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import api from '../services/api';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { itemCount } = useCart();
 
   const isAuthRoute = ['/login', '/register'].includes(location.pathname);
 
@@ -33,6 +35,10 @@ const Navbar = () => {
             <NavLink to="/home" className="nav-link">Home</NavLink>
             <NavLink to="/products" className="nav-link">Products</NavLink>
             <NavLink to="/wishlist" className="nav-link">Wishlist</NavLink>
+            <NavLink to="/orders" className="nav-link">Orders</NavLink>
+            <NavLink to="/cart" className="nav-link cart-nav-link">
+              Cart ({itemCount})
+            </NavLink>
           </nav>
           <button type="button" className="logout-btn" onClick={handleLogout}>
             Logout
