@@ -1,10 +1,14 @@
 const Customer = require('../models/customer.model');
 const generateToken = require('../utils/generateToken');
 
-const cookieOptions = {
+const cookieSecurityOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+};
+
+const cookieOptions = {
+  ...cookieSecurityOptions,
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 };
 
@@ -77,11 +81,7 @@ const getProfile = async (req, res) => {
 
 // POST /customers/logout (protected)
 const logout = async (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
-  });
+  res.clearCookie('token', cookieSecurityOptions);
   return res.json({ success: true, message: 'Logged out successfully' });
 };
 
