@@ -134,6 +134,12 @@ The frontend is usually available at:
 http://localhost:5173
 ```
 
+## Deployment
+
+Deploy `backend/` as a Render web service and `frontend/` as a Vercel project. The frontend's [Vercel rewrites](frontend/vercel.json) proxy `/api/*` requests to the Render API so authentication cookies remain same-origin in the browser. If your Render service URL changes, update the rewrite destination there and deploy the frontend again.
+
+For Vercel, use `frontend/` as the project root and build with `npm run build` (output directory: `dist`). The production frontend uses `/api` automatically; locally, `VITE_API_URL` can continue to point to `http://localhost:5000`.
+
 ## Core API Endpoints
 
 The backend exposes these main routes:
@@ -182,4 +188,3 @@ The backend exposes these main routes:
 ## License
 
 This project does not include a formal license file at the repository root. If you plan to reuse or distribute it, confirm the intended licensing terms with the repository owner before doing so.
-
